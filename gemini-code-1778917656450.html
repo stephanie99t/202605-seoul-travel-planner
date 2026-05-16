@@ -6,6 +6,8 @@
     <title>✈️ The Excel-Free Planner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -22,6 +24,13 @@
             }
         }
     </script>
+    <style>
+        /* Smooth animation when dropping */
+        .sortable-ghost {
+            opacity: 0.4;
+            background-color: #f3eae0 !important;
+        }
+    </style>
 </head>
 <body class="bg-brand-bg min-h-screen text-brand-text font-sans pb-16">
 
@@ -103,21 +112,18 @@
         <hr class="border-brand/50 mb-12">
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            
             <section id="summary-section" class="bg-[#fffdfa] rounded-2xl p-6 shadow-sm border border-brand">
                 <h3 class="text-xl font-bold text-brand-text flex items-center mb-4 border-b border-brand pb-2">
                     <i class="fa-solid fa-calculator mr-3 text-brand-dark"></i>Daily Spend Summary
                 </h3>
-                <div id="daily-summary-list" class="space-y-3">
-                    <p class="text-sm text-gray-400 italic">Add costs to activities to see daily sums here.</p>
-                </div>
+                <div id="daily-summary-list" class="space-y-3"></div>
             </section>
 
             <section id="notes-section" class="bg-[#fffdfa] rounded-2xl p-6 shadow-sm border border-brand">
                 <h3 class="text-xl font-bold text-brand-text flex items-center mb-4 border-b border-brand pb-2">
                     <i class="fa-solid fa-clipboard mr-3 text-brand-dark"></i>Important Notes
                 </h3>
-                <textarea id="important-notes" placeholder="Flight details, Airbnb codes, reminders to bring adaptors..." class="w-full h-40 bg-brand-bg border border-brand/50 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand resize-none"></textarea>
+                <textarea id="important-notes" placeholder="Flight details, Airbnb codes, reminders..." class="w-full h-40 bg-brand-bg border border-brand/50 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand resize-none"></textarea>
             </section>
 
             <section id="checklist-section" class="bg-[#fffdfa] rounded-2xl p-6 shadow-sm border border-brand md:col-span-2">
@@ -130,11 +136,9 @@
                     </button>
                 </div>
                 <div id="checklist-container" class="space-y-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    </div>
+                </div>
             </section>
-
         </div>
-
     </main>
 
     <div id="toast" class="fixed bottom-5 right-5 bg-brand-text text-white px-6 py-3 rounded-xl shadow-xl transform translate-y-24 opacity-0 transition duration-300 pointer-events-none flex items-center z-50">
@@ -145,11 +149,11 @@
         window.onload = function() {
             if (window.location.hash && window.location.hash.startsWith('#data=')) {
                 loadFromURL();
-            } else if (localStorage.getItem('travelPlanV4')) {
+            } else if (localStorage.getItem('travelPlanV5')) {
                 loadFromStorage();
             } else {
                 addDay(); 
-                addChecklistItem("Passport & ID"); // Default item
+                addChecklistItem("Passport & ID"); 
                 addChecklistItem("Universal Adaptor");
             }
             calculateTotal();
@@ -162,36 +166,38 @@
             { id: 'night', title: 'Night', icon: 'fa-moon' }
         ];
 
+        // V5: Added drag-handle icon
         function getActivityHTML(time = "", desc = "", note = "", district = "", cost = "", who = "👥 Everyone") {
             const options = ["👥 Everyone", "🧋 Anne", "🐈‍⬛ Trinh", "🐣 Roda", "🌻 Ashley", "🍊 Stephanie"].map(opt => 
                 `<option value="${opt}" ${who === opt ? 'selected' : ''}>${opt}</option>`
             ).join('');
 
             return `
-                <div class="activity-item relative flex flex-col lg:flex-row gap-3 items-start lg:items-center bg-white p-3 rounded-xl border border-brand shadow-sm group">
+                <div class="activity-item relative flex flex-col lg:flex-row gap-3 items-start lg:items-center bg-white p-3 rounded-xl border border-brand shadow-sm group transition-all">
                     <div class="absolute -left-[29px] lg:-left-[29px] top-5 lg:top-1/2 lg:-translate-y-1/2 w-4 h-4 bg-brand rounded-full border-[3px] border-white shadow-sm z-10"></div>
                     
-                    <div class="w-full lg:w-24 flex items-center gap-2">
+                    <div class="w-full lg:w-32 flex items-center gap-2">
+                        <i class="fa-solid fa-grip-vertical drag-handle cursor-grab text-brand-dark/50 hover:text-brand-dark px-1 text-lg"></i>
                         <i class="fa-regular fa-clock text-brand-dark"></i>
                         <input type="text" placeholder="09:00" value="${time}" class="activity-time w-full bg-brand-bg border border-brand/50 rounded px-2 py-1 text-sm font-bold focus:outline-none focus:border-brand-dark">
                     </div>
                     
-                    <div class="w-full lg:w-28 flex items-center gap-2">
-                        <i class="fa-solid fa-location-dot text-brand-dark"></i>
+                    <div class="w-full lg:w-28 flex items-center gap-2 pl-6 lg:pl-0">
+                        <i class="fa-solid fa-location-dot text-brand-dark hidden lg:inline-block"></i>
                         <input type="text" placeholder="Area" value="${district}" class="activity-district w-full bg-brand-bg border border-brand/50 rounded px-2 py-1 text-sm font-medium focus:outline-none focus:border-brand-dark text-brand-dark">
                     </div>
 
-                    <div class="w-full flex-1 flex flex-col gap-1">
+                    <div class="w-full flex-1 flex flex-col gap-1 pl-6 lg:pl-0">
                         <input type="text" placeholder="Where to?" value="${desc}" class="activity-desc w-full bg-brand-bg border border-brand/50 rounded px-2 py-1 text-sm font-bold focus:outline-none focus:border-brand-dark">
                         <input type="text" placeholder="Description / Must eat" value="${note}" class="activity-note w-full bg-transparent border-none px-2 py-0 text-xs text-gray-500 focus:outline-none focus:ring-1 focus:ring-brand/50 rounded placeholder-gray-400">
                     </div>
 
-                    <div class="w-full lg:w-36 flex items-center">
+                    <div class="w-full lg:w-36 flex items-center pl-6 lg:pl-0">
                          <select class="activity-who w-full bg-white border border-brand rounded px-2 py-1 text-sm font-medium focus:outline-none cursor-pointer">
                             ${options}
                          </select>
                     </div>
-                    <div class="w-full lg:w-28 flex items-center gap-1">
+                    <div class="w-full lg:w-28 flex items-center gap-1 pl-6 lg:pl-0">
                         <i class="fa-solid fa-won-sign text-brand-dark ml-1"></i>
                         <input type="number" placeholder="Cost" value="${cost}" class="activity-cost w-full bg-brand-bg border border-brand/50 rounded px-2 py-1 text-sm focus:outline-none focus:border-brand-dark" oninput="calculateTotal()">
                     </div>
@@ -207,6 +213,20 @@
             `;
         }
 
+        // Initialize SortableJS on specific list
+        function initSortable(listElement) {
+            new Sortable(listElement, {
+                group: 'shared', // Allows dragging between Morning/Afternoon/etc.
+                animation: 150,
+                handle: '.drag-handle', // Only drag when clicking the icon
+                ghostClass: 'sortable-ghost',
+                onEnd: function() {
+                    // Update totals just in case
+                    calculateTotal();
+                }
+            });
+        }
+
         function addDay(dayName = null) {
             const container = document.getElementById('itinerary-container');
             const dayCount = container.querySelectorAll('.day-card').length + 1;
@@ -219,7 +239,7 @@
                         <h4 class="text-md font-bold text-brand-dark flex items-center mb-3 ml-2 uppercase tracking-wide text-xs">
                             <i class="fa-solid ${block.icon} mr-2"></i> ${block.title}
                         </h4>
-                        <div class="border-l-[3px] border-brand ml-4 pl-5 pb-2 space-y-4 activities-list relative">
+                        <div class="border-l-[3px] border-brand ml-4 pl-5 pb-2 space-y-4 activities-list relative min-h-[10px]">
                         </div>
                         <button onclick="addActivityToBlock(this)" class="ml-10 mt-3 text-xs font-bold text-brand-dark hover:text-brand-text bg-white border border-brand rounded-full px-3 py-1 transition shadow-sm flex items-center">
                             <i class="fa-solid fa-plus mr-1"></i> Add Spot
@@ -246,11 +266,16 @@
             `;
             container.appendChild(dayCard);
             
+            // Apply SortableJS to all the new blocks in this day
+            dayCard.querySelectorAll('.activities-list').forEach(list => {
+                initSortable(list);
+            });
+            
             if(!dayName) {
                 const newDayMorningList = dayCard.querySelector('.block-morning .activities-list');
                 newDayMorningList.insertAdjacentHTML('beforeend', getActivityHTML());
             }
-            calculateTotal(); // Update summary
+            calculateTotal(); 
         }
 
         function addActivityToBlock(btn) {
@@ -258,7 +283,6 @@
             list.insertAdjacentHTML('beforeend', getActivityHTML());
         }
 
-        // V4: Checklist functions
         function addChecklistItem(text = "", checked = false) {
             const container = document.getElementById('checklist-container');
             const isChecked = checked ? "checked" : "";
@@ -274,11 +298,10 @@
             container.insertAdjacentHTML('beforeend', itemHTML);
         }
 
-        // V4: Calculate Total AND Daily Summary
         function calculateTotal() {
             let grandTotalKRW = 0;
             const summaryList = document.getElementById('daily-summary-list');
-            summaryList.innerHTML = ''; // Clear previous summary
+            summaryList.innerHTML = ''; 
 
             const dayCards = document.querySelectorAll('.day-card');
             
@@ -297,7 +320,6 @@
                 
                 grandTotalKRW += dayTotal;
 
-                // Add to summary block
                 const dayRow = document.createElement('div');
                 dayRow.className = "flex justify-between items-center border-b border-brand/30 py-2 last:border-0";
                 dayRow.innerHTML = `
@@ -307,10 +329,8 @@
                 summaryList.appendChild(dayRow);
             });
 
-            // Update KRW display
             document.getElementById('total-cost').innerText = grandTotalKRW.toLocaleString();
 
-            // Calculate HKD
             const rate = parseFloat(document.getElementById('exchange-rate').value) || 0;
             const totalHKD = grandTotalKRW * rate;
             document.getElementById('total-hkd').innerText = totalHKD.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
@@ -333,10 +353,10 @@
                 destination: document.getElementById('destination').value,
                 dates: document.getElementById('travel-dates').value,
                 hotel: document.getElementById('hotel').value,
-                rate: document.getElementById('exchange-rate').value, // V4 save
-                notes: document.getElementById('important-notes').value, // V4 save
+                rate: document.getElementById('exchange-rate').value,
+                notes: document.getElementById('important-notes').value, 
                 days: [],
-                checklist: [] // V4 save
+                checklist: [] 
             };
 
             document.querySelectorAll('.day-card').forEach(dayCard => {
@@ -362,7 +382,6 @@
                 planData.days.push(dayObj);
             });
 
-            // Save Checklist state
             document.querySelectorAll('.checklist-item').forEach(item => {
                 planData.checklist.push({
                     text: item.querySelector('.checklist-text').value,
@@ -370,8 +389,8 @@
                 });
             });
 
-            // Version 4 Storage Key
-            localStorage.setItem('travelPlanV4', JSON.stringify(planData));
+            // Version 5 Storage Key
+            localStorage.setItem('travelPlanV5', JSON.stringify(planData));
             
             const encodedData = btoa(encodeURIComponent(JSON.stringify(planData)));
             const shareableLink = window.location.origin + window.location.pathname + "#data=" + encodedData;
@@ -410,15 +429,14 @@
                 }
             });
 
-            // Load Checklist
             const clContainer = document.getElementById('checklist-container');
-            clContainer.innerHTML = ''; // Clear default items
+            clContainer.innerHTML = ''; 
             if(data.checklist && data.checklist.length > 0) {
                 data.checklist.forEach(item => {
                     addChecklistItem(item.text, item.done);
                 });
             } else {
-                addChecklistItem("Passport & ID"); // Fallback
+                addChecklistItem("Passport & ID"); 
             }
 
             calculateTotal();
@@ -426,8 +444,9 @@
 
         function loadFromStorage() {
             try {
-                // Try V4 first, fallback to older
-                let data = JSON.parse(localStorage.getItem('travelPlanV4'));
+                // Cascading load to ensure backwards compatibility with your old links!
+                let data = JSON.parse(localStorage.getItem('travelPlanV5'));
+                if(!data) data = JSON.parse(localStorage.getItem('travelPlanV4'));
                 if(!data) data = JSON.parse(localStorage.getItem('travelPlanV3'));
                 if(!data) data = JSON.parse(localStorage.getItem('travelPlanV2'));
                 if(data) loadDataToUI(data);
