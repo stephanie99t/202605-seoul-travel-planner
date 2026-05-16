@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,10 +12,10 @@
                 extend: {
                     colors: {
                         brand: {
-                            DEFAULT: '#E5D7C5', /* Your requested Beige */
-                            dark: '#c1ad94',    /* Slightly darker for borders/icons */
-                            text: '#5c4a38',    /* Dark brown for readable text */
-                            bg: '#fcfbfa'       /* Very light off-white for background */
+                            DEFAULT: '#E5D7C5',
+                            dark: '#c1ad94',
+                            text: '#5c4a38',
+                            bg: '#fcfbfa'
                         }
                     }
                 }
@@ -23,303 +23,47 @@
         }
     </script>
 </head>
-<body class="bg-brand-bg min-h-screen text-brand-text font-sans pb-12">
+<body class="bg-brand-bg min-h-screen text-brand-text font-sans pb-16">
 
-    <header class="bg-white shadow-sm mb-8 border-b-2 border-brand">
-        <div class="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <h1 class="text-3xl font-extrabold text-brand-text tracking-wide text-center md:text-left flex items-center">
-                <i class="fa-solid fa-route animate-pulse text-brand-dark mr-3"></i>The Excel-free Planner
-            </h1>
-            <div class="space-x-2 w-full md:w-auto">
-                <button onclick="saveItinerary()" class="bg-brand hover:bg-brand-dark text-brand-text font-bold py-2 px-6 rounded-lg shadow-sm transition duration-200 w-full md:w-auto flex justify-center items-center">
-                    <i class="fa-solid fa-share-nodes mr-2"></i>Save & Copy Link
-                </button>
+    <header class="bg-white shadow-sm mb-6 border-b-2 border-brand">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+                <h1 class="text-3xl font-extrabold text-brand-text tracking-wide text-center md:text-left flex items-center">
+                    <i class="fa-solid fa-route animate-pulse text-brand-dark mr-3"></i>The Excel-free Planner
+                </h1>
+                <div class="space-x-2 w-full md:w-auto">
+                    <button onclick="saveItinerary()" class="bg-brand hover:bg-brand-dark text-brand-text font-bold py-2 px-6 rounded-lg shadow-sm transition duration-200 w-full md:w-auto flex justify-center items-center">
+                        <i class="fa-solid fa-share-nodes mr-2"></i>Save & Copy Link
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-3 justify-center md:justify-start border-t border-brand/30 pt-3">
+                <a href="#summary-section" class="bg-brand-bg border border-brand text-brand-text hover:bg-brand px-4 py-1.5 rounded-full text-sm font-bold transition flex items-center">
+                    <i class="fa-solid fa-calculator mr-2"></i> Daily Spend
+                </a>
+                <a href="#notes-section" class="bg-brand-bg border border-brand text-brand-text hover:bg-brand px-4 py-1.5 rounded-full text-sm font-bold transition flex items-center">
+                    <i class="fa-solid fa-clipboard mr-2"></i> Notes
+                </a>
+                <a href="#checklist-section" class="bg-brand-bg border border-brand text-brand-text hover:bg-brand px-4 py-1.5 rounded-full text-sm font-bold transition flex items-center">
+                    <i class="fa-solid fa-list-check mr-2"></i> Checklist
+                </a>
             </div>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4">
+    <main class="max-w-7xl mx-auto px-4">
         
-        <section class="bg-white rounded-2xl p-6 shadow-sm border border-brand/50 mb-8 grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div>
+        <section class="bg-white rounded-2xl p-6 shadow-sm border border-brand/50 mb-8 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div class="lg:col-span-1">
                 <label class="block text-xs font-bold text-brand-dark uppercase tracking-wide mb-1">Destination</label>
                 <input type="text" id="destination" value="Seoul 2026 🇰🇷" class="w-full text-lg font-bold bg-brand-bg border border-brand/50 rounded-lg p-2 focus:ring-2 focus:ring-brand outline-none transition">
             </div>
-            <div>
+            <div class="lg:col-span-1">
                 <label class="block text-xs font-bold text-brand-dark uppercase tracking-wide mb-1">Travel Dates</label>
                 <input type="text" id="travel-dates" value="May 12 - May 18" class="w-full text-lg font-bold bg-brand-bg border border-brand/50 rounded-lg p-2 focus:ring-2 focus:ring-brand outline-none transition">
             </div>
-            <div>
+            <div class="lg:col-span-1">
                 <label class="block text-xs font-bold text-brand-dark uppercase tracking-wide mb-1">Hotel</label>
                 <div class="flex bg-brand-bg border border-brand/50 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-brand transition">
-                    <input type="text" id="hotel" value="Lotte Hotel Seoul" class="w-full text-lg font-bold bg-transparent p-2 outline-none">
-                    <button onclick="openMapFromInput('hotel')" title="Map" class="bg-brand px-3 text-brand-text hover:bg-brand-dark transition">
-                        <i class="fa-solid fa-map-location-dot"></i>
-                    </button>
-                </div>
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-brand-dark uppercase tracking-wide mb-1">Time Window</label>
-                <input type="text" id="active-time" value="09:00 - 22:00" class="w-full text-lg font-bold bg-brand-bg border border-brand/50 rounded-lg p-2 focus:ring-2 focus:ring-brand outline-none transition">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-brand-dark uppercase tracking-wide mb-1">Total Budget</label>
-                <div class="w-full text-lg font-bold text-brand-text bg-brand border border-brand rounded-lg p-2 flex items-center shadow-inner">
-                    $ <span id="total-cost" class="ml-1">0</span>
-                </div>
-            </div>
-        </section>
-
-        <section id="itinerary-container" class="space-y-8">
-            </section>
-
-        <div class="mt-8 text-center">
-            <button onclick="addDay()" class="bg-white border-2 border-brand text-brand-text font-bold py-3 px-10 rounded-full shadow-sm hover:bg-brand transition duration-200">
-                <i class="fa-solid fa-calendar-plus mr-2"></i>Add Next Day
-            </button>
-        </div>
-
-    </main>
-
-    <div id="toast" class="fixed bottom-5 right-5 bg-brand-text text-white px-6 py-3 rounded-xl shadow-xl transform translate-y-24 opacity-0 transition duration-300 pointer-events-none flex items-center z-50">
-        <i class="fa-solid fa-circle-check mr-2 text-brand"></i> <span id="toast-msg">Plan saved & Link copied!</span>
-    </div>
-
-    <script>
-        // Check URL for shared data or load local data
-        window.onload = function() {
-            if (window.location.hash && window.location.hash.startsWith('#data=')) {
-                loadFromURL();
-            } else if (localStorage.getItem('travelPlanV2')) {
-                loadFromStorage();
-            } else {
-                addDay(); // Default Day 1
-            }
-            calculateTotal();
-        }
-
-        // Time blocks configuration
-        const timeBlocks = [
-            { id: 'morning', title: 'Morning', icon: 'fa-mug-hot' },
-            { id: 'afternoon', title: 'Afternoon', icon: 'fa-sun' },
-            { id: 'evening', title: 'Evening', icon: 'fa-utensils' },
-            { id: 'night', title: 'Night', icon: 'fa-moon' }
-        ];
-
-        // Generate a single Activity Row with Agenda Point
-        function getActivityHTML(time = "", desc = "", cost = "", who = "👥 Everyone") {
-            const options = ["👥 Everyone", "👩🏻 Mary", "👦🏼 John", "🦊 Chris"].map(opt => 
-                `<option value="${opt}" ${who === opt ? 'selected' : ''}>${opt}</option>`
-            ).join('');
-
-            return `
-                <div class="activity-item relative flex flex-col lg:flex-row gap-3 items-start lg:items-center bg-white p-3 rounded-xl border border-brand shadow-sm group">
-                    <div class="absolute -left-[29px] lg:-left-[29px] top-5 lg:top-1/2 lg:-translate-y-1/2 w-4 h-4 bg-brand rounded-full border-[3px] border-white shadow-sm z-10"></div>
-                    
-                    <div class="w-full lg:w-28 flex items-center gap-2">
-                        <i class="fa-regular fa-clock text-brand-dark"></i>
-                        <input type="text" placeholder="e.g. 09:00" value="${time}" class="activity-time w-full bg-brand-bg border border-brand/50 rounded px-2 py-1 text-sm font-bold focus:outline-none focus:border-brand-dark">
-                    </div>
-                    <div class="w-full flex-1">
-                        <input type="text" placeholder="Where to? (e.g. Bukchon Hanok Village)" value="${desc}" class="activity-desc w-full bg-brand-bg border border-brand/50 rounded px-2 py-1 text-sm font-medium focus:outline-none focus:border-brand-dark">
-                    </div>
-                    <div class="w-full lg:w-36 flex items-center">
-                         <select class="activity-who w-full bg-white border border-brand rounded px-2 py-1 text-sm font-medium focus:outline-none cursor-pointer">
-                            ${options}
-                         </select>
-                    </div>
-                    <div class="w-full lg:w-24 flex items-center gap-1">
-                        <i class="fa-solid fa-dollar-sign text-brand-dark ml-1"></i>
-                        <input type="number" placeholder="Cost" value="${cost}" class="activity-cost w-full bg-brand-bg border border-brand/50 rounded px-2 py-1 text-sm focus:outline-none focus:border-brand-dark" oninput="calculateTotal()">
-                    </div>
-                    <div class="flex w-full lg:w-auto gap-1 justify-end mt-2 lg:mt-0">
-                        <button onclick="openMap(this)" title="Search on Maps" class="text-brand-text bg-brand/50 hover:bg-brand px-3 py-1.5 rounded transition">
-                            <i class="fa-solid fa-map-location-dot"></i>
-                        </button>
-                        <button onclick="this.closest('.activity-item').remove(); calculateTotal();" title="Delete" class="text-red-400 bg-red-50 hover:bg-red-100 hover:text-red-600 px-3 py-1.5 rounded transition">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Add a new Day Card with Morning, Afternoon, Evening, Night blocks
-        function addDay(dayName = null) {
-            const container = document.getElementById('itinerary-container');
-            const dayCount = container.querySelectorAll('.day-card').length + 1;
-            const finalDayName = dayName || `Day ${dayCount}`;
-            
-            let blocksHTML = '';
-            timeBlocks.forEach(block => {
-                blocksHTML += `
-                    <div class="time-block block-${block.id} mb-6 last:mb-0">
-                        <h4 class="text-md font-bold text-brand-dark flex items-center mb-3 ml-2 uppercase tracking-wide text-xs">
-                            <i class="fa-solid ${block.icon} mr-2"></i> ${block.title}
-                        </h4>
-                        <div class="border-l-[3px] border-brand ml-4 pl-5 pb-2 space-y-4 activities-list relative">
-                            </div>
-                        <button onclick="addActivityToBlock(this)" class="ml-10 mt-3 text-xs font-bold text-brand-dark hover:text-brand-text bg-white border border-brand rounded-full px-3 py-1 transition shadow-sm flex items-center">
-                            <i class="fa-solid fa-plus mr-1"></i> Add Spot
-                        </button>
-                    </div>
-                `;
-            });
-
-            const dayCard = document.createElement('div');
-            dayCard.className = "day-card bg-[#fffdfa] rounded-2xl shadow-sm border border-brand overflow-hidden";
-            dayCard.innerHTML = `
-                <div class="bg-brand/30 px-6 py-4 border-b border-brand flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-brand-text flex items-center">
-                        <i class="fa-solid fa-calendar-day mr-3 text-brand-dark"></i>
-                        <input type="text" value="${finalDayName}" class="day-title bg-transparent border-none focus:ring-0 text-xl font-extrabold outline-none w-40 focus:bg-white focus:rounded px-2">
-                    </h3>
-                    <button onclick="this.closest('.day-card').remove(); calculateTotal();" class="text-red-400 hover:text-red-600">
-                        <i class="fa-solid fa-times text-lg"></i>
-                    </button>
-                </div>
-                <div class="p-6">
-                    ${blocksHTML}
-                </div>
-            `;
-            container.appendChild(dayCard);
-            
-            // Add a default blank activity to Morning if it's a new empty day
-            if(!dayName) {
-                const newDayMorningList = dayCard.querySelector('.block-morning .activities-list');
-                newDayMorningList.insertAdjacentHTML('beforeend', getActivityHTML());
-            }
-        }
-
-        function addActivityToBlock(btn) {
-            const list = btn.previousElementSibling;
-            list.insertAdjacentHTML('beforeend', getActivityHTML());
-        }
-
-        function calculateTotal() {
-            let total = 0;
-            document.querySelectorAll('.activity-cost').forEach(input => {
-                let cost = parseFloat(input.value);
-                if (!isNaN(cost)) total += cost;
-            });
-            document.getElementById('total-cost').innerText = total.toLocaleString();
-        }
-
-        function openMap(button) {
-            const desc = button.closest('.activity-item').querySelector('.activity-desc').value;
-            if(desc.trim() === '') return alert("Please enter a location first.");
-            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(desc)}`, '_blank');
-        }
-
-        function openMapFromInput(inputId) {
-            const val = document.getElementById(inputId).value;
-            if(val.trim() === '') return;
-            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(val)}`, '_blank');
-        }
-
-        function saveItinerary() {
-            const planData = {
-                destination: document.getElementById('destination').value,
-                dates: document.getElementById('travel-dates').value,
-                hotel: document.getElementById('hotel').value,
-                activeTime: document.getElementById('active-time').value,
-                days: []
-            };
-
-            document.querySelectorAll('.day-card').forEach(dayCard => {
-                const dayObj = { 
-                    dayName: dayCard.querySelector('.day-title').value, 
-                    blocks: {} 
-                };
-                
-                timeBlocks.forEach(tb => {
-                    const activities = [];
-                    dayCard.querySelectorAll(`.block-${tb.id} .activity-item`).forEach(item => {
-                        activities.push({
-                            time: item.querySelector('.activity-time').value,
-                            desc: item.querySelector('.activity-desc').value,
-                            who: item.querySelector('.activity-who').value,
-                            cost: item.querySelector('.activity-cost').value
-                        });
-                    });
-                    dayObj.blocks[tb.id] = activities;
-                });
-                planData.days.push(dayObj);
-            });
-
-            // Save under new key to avoid conflict with old format
-            localStorage.setItem('travelPlanV2', JSON.stringify(planData));
-            
-            // Encode to URL
-            const encodedData = btoa(encodeURIComponent(JSON.stringify(planData)));
-            const shareableLink = window.location.origin + window.location.pathname + "#data=" + encodedData;
-            window.history.replaceState(null, null, shareableLink);
-
-            navigator.clipboard.writeText(shareableLink).then(() => {
-                showToast("Plan saved & Link copied! Send it to your group.");
-            }).catch(() => showToast("Plan saved! Copy the URL above to share."));
-        }
-
-        function loadDataToUI(data) {
-            document.getElementById('destination').value = data.destination || '';
-            document.getElementById('travel-dates').value = data.dates || '';
-            if(data.hotel) document.getElementById('hotel').value = data.hotel;
-            document.getElementById('active-time').value = data.activeTime || '';
-
-            const container = document.getElementById('itinerary-container');
-            container.innerHTML = ''; 
-
-            data.days.forEach(day => {
-                addDay(day.dayName);
-                const currentDayCard = container.lastElementChild;
-                
-                // Support loading V2 (blocks) data
-                if (day.blocks) {
-                    timeBlocks.forEach(tb => {
-                        const list = currentDayCard.querySelector(`.block-${tb.id} .activities-list`);
-                        if(day.blocks[tb.id]) {
-                            day.blocks[tb.id].forEach(act => {
-                                list.insertAdjacentHTML('beforeend', getActivityHTML(act.time, act.desc, act.cost, act.who));
-                            });
-                        }
-                    });
-                } 
-                // Fallback for V1 (flat list) data if you open an old link
-                else if (day.activities) {
-                    const morningList = currentDayCard.querySelector(`.block-morning .activities-list`);
-                    day.activities.forEach(act => {
-                        morningList.insertAdjacentHTML('beforeend', getActivityHTML(act.time, act.desc, act.cost, "👥 Everyone"));
-                    });
-                }
-            });
-            calculateTotal();
-        }
-
-        function loadFromStorage() {
-            try {
-                const data = JSON.parse(localStorage.getItem('travelPlanV2'));
-                if(data) loadDataToUI(data);
-            } catch(e) { console.error("Error loading storage"); }
-        }
-
-        function loadFromURL() {
-            try {
-                const hashData = window.location.hash.substring(6);
-                const data = JSON.parse(decodeURIComponent(atob(hashData)));
-                loadDataToUI(data);
-                showToast("Shared plan loaded!");
-            } catch(e) {
-                alert("Shared link broken or expired. Loading local save.");
-                loadFromStorage();
-            }
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = msg;
-            toast.classList.remove('translate-y-24', 'opacity-0');
-            setTimeout(() => toast.classList.add('translate-y-24', 'opacity-0'), 3500);
-        }
-    </script>
-</body>
-</html>
+                    <input type="text" id="hotel" value="Lotte Hotel" class="w-full text-lg font-bold bg-transparent p-2 outline-none">
